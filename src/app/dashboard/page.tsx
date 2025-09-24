@@ -6,8 +6,8 @@ import { useEffect } from 'react'
 import { Role } from '@prisma/client'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { Navigation } from '@/components/navigation'
-import { AdminDashboard } from '@/components/admin-dashboard'
-import { EmployeeDashboard } from '@/components/employee-dashboard'
+import { AdminMainDashboard } from '@/components/dashboards/admin-main-dashboard'
+import { EmployeeMainDashboard } from '@/components/dashboards/employee-main-dashboard'
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
@@ -41,7 +41,18 @@ export default function DashboardPage() {
     return null
   }
 
-  const isAdmin = session.user.role === Role.ADMIN || session.user.role === Role.HR || session.user.role === Role.MANAGER
+  const renderDashboard = () => {
+    switch (session.user.role) {
+      case Role.ADMIN:
+      case Role.HR:
+      case Role.MANAGER:
+        return <AdminMainDashboard />
+      case Role.EMPLOYEE:
+        return <EmployeeMainDashboard />
+      default:
+        return <EmployeeMainDashboard />
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
@@ -54,7 +65,7 @@ export default function DashboardPage() {
       
       <Navigation />
       <main className="py-8 relative z-10">
-        {isAdmin ? <AdminDashboard /> : <EmployeeDashboard />}
+        {renderDashboard()}
       </main>
     </div>
   )
